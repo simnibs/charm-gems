@@ -1,7 +1,7 @@
 # project info
 project(gems)
 cmake_minimum_required(VERSION 3.9)
-enable_language(C CXX Fortran)
+enable_language(C CXX)
 
 
 # prevent third-party packages from importing as a system, OP: no clue what this is

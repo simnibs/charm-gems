@@ -9,3 +9,14 @@ install_manifest.txt
 compile_commands.json
 CTestTestfile.cmake
 _deps
+
+build/
+dist/
+ITK-install/
+*.egg-info/
+__pycache__/
+*.so
+*.a
+*.so
+*.dylib
+gems_python/ITKFactoryRegistration/
