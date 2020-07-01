@@ -33,24 +33,24 @@ class build_ext_(build_ext):
         shutil.copy(compiled_lib[0], 'charm_gems')
 
 
-setup(name='charm_gems',
-      version=__version__,
-      description='Something descriptive',
-      url='https://github.com/simnibs/charm-gems',
-      author='Oula Puonti and Koen Van Leemput',
-      author_email='oulap@drcmr.dk',
-      packages=['charm_gems'],
-      license='GPL3',
-      # We define ext_modules to trigger a build_ext run
-      ext_modules=[
-          Extension(
-              'charm_gems.gemsbindings', ['dummy'],
-              depends=glob.glob('gems*/*.cxx') + glob.glob('gems*/*.h')
-          )],
-      cmdclass={
-          'build_ext': build_ext_,
-        },
-      setup_requires=['pybind11>=2.5.0'],
-      install_requires=['numpy'],
-      zip_safe=False
-     )
+setup(
+    name='charm_gems',
+    version=__version__,
+    description='Something descriptive',
+    url='https://github.com/simnibs/charm-gems',
+    author='Oula Puonti and Koen Van Leemput',
+    author_email='oulap@drcmr.dk',
+    packages=['charm_gems'],
+    license='GPL3',
+    # We define ext_modules to trigger a build_ext run
+    ext_modules=[
+        Extension(
+            'charm_gems.gemsbindings', ['dummy'],
+            depends=glob.glob('gems*/*.cxx') + glob.glob('gems*/*.h')
+        )],
+    cmdclass={
+        'build_ext': build_ext_,
+      },
+    install_requires=['numpy'],
+    zip_safe=False
+)
