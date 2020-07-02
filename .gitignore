@@ -19,4 +19,8 @@ __pycache__/
 *.a
 *.so
 *.dylib
+*.pyd
+*.vcxproj*
+*.dir/
+*.sln
 gems_python/ITKFactoryRegistration/

@@ -15,6 +15,7 @@ git submodule update
 * Python >= 3.7
 * CMake
 * Make (Linux/MacOS)
+* ZLib
 
 ## Instructios
 
@@ -49,8 +50,20 @@ cmake.exe ^
     -DBUILD_EXAMPLES=OFF ^
     -DCMAKE_INSTALL_PREFIX=..\ITK-install ^
     ..\ITK
-make install
+"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat"
+msbuild ALL_BUILD.vcxproj
+msbuild INSTALL.vcxproj
 cd ..
 ```
 
+2. Install zlib (in an administrator prompt)
+```
+powershell -Command "(New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/horta/zlib.install/master/install.bat', 'install.bat')"; ./install.bat
+```
+
+3. Install charm-gems
+```
 "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat"
+set ITK_DIR=ITK-install
+python setup.py install
+``` 
