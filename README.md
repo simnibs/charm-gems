@@ -22,8 +22,8 @@ git submodule update
 ### Linux/MacOS
 1. Build ITK
 ```
-mkdir ITK-tmp
-cd ITK-tmp
+mkdir ITK-build
+cd ITK-build
 cmake \
     -DBUILD_SHARED_LIBS=OFF \
     -DBUILD_TESTING=OFF \
@@ -41,8 +41,8 @@ ITK_DIR=ITK-install python setup.py install
 ### Windows (Visual Studio 2019)
 1. Build ITK
 ```
-md ITK-tmp
-cd ITK-tmp
+md ITK-build
+cd ITK-build
 cmake.exe ^
     -G "Visual Studio 16 2019" ^
     -DBUILD_SHARED_LIBS=OFF ^
@@ -51,7 +51,6 @@ cmake.exe ^
     -DCMAKE_INSTALL_PREFIX=..\ITK-install ^
     ..\ITK
 "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat"
-msbuild ALL_BUILD.vcxproj
 msbuild INSTALL.vcxproj
 cd ..
 ```
