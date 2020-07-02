@@ -1,5 +1,4 @@
-name: C/C++ CI
-
+name: Windows Build
 on:
   push:
     branches: [ master ]
@@ -15,12 +14,14 @@ jobs:
       run: | 
         git submodule init
         git submodule update
+    - name: setup-msbuild
+      uses: microsoft/setup-msbuild@v1
     - name: Build ITK
       run: |
+        msbuild /?
         md ITK-build
         cd ITK-build
         cmake.exe -G "Visual Studio 16 2019" -DBUILD_SHARED_LIBS=OFF -DBUILD_TESTING=OFF -DBUILD_EXAMPLES=OFF -DCMAKE_INSTALL_PREFIX=..\ITK-install ..\ITK
-        "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
         msbuild INSTALL.vcxproj
         cd ..
     - name: Install zlib
@@ -29,6 +30,5 @@ jobs:
          ./install.bat
     - name: Install charm-gems
       run: |
-        "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
         set ITK_DIR=ITK-install
         python3.7 setup.py install
