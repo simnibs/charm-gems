@@ -23,6 +23,24 @@ def build_itk_posix(itk_install_dir):
         )
         subprocess.run(['make', 'install'], check=True)
 
+def build_itk_win(itk_install_dir):
+    itk_install_dir = os.path.abspath(itk_install_dir)
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmpdir = 'ITK-TMP2'
+        os.makedirs(tmpdir, exist_ok=True)
+        os.chdir(tmpdir)
+        subprocess.run([
+            r'C:\CMake\bin\cmake',
+            '-G', 'Visual Studio 16 2019',
+            '-DBUILD_SHARED_LIBS=OFF',
+            '-DBUILD_TESTING=OFF',
+            '-DBUILD_EXAMPLES=OFF',
+            f'-DCMAKE_INSTALL_PREFIX={itk_install_dir}',
+            ITK_SOURCE_DIR],
+            check=True
+        )
+        subprocess.run(['make', 'install'], check=True)
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
@@ -34,4 +52,7 @@ if __name__ == '__main__':
         help="Directory where the ITK library will be installed"
     )
     args = parser.parse_args(sys.argv[1:])
-    build_itk_posix(args.itk_install_dir)
+    if sys.platform == 'win32':
+        build_itk_win(args.itk_install_dir)
+    else:
+        build_itk_posix(args.itk_install_dir)
