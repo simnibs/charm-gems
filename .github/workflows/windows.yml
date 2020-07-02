@@ -16,9 +16,13 @@ jobs:
         git submodule update
     - name: setup-msbuild
       uses: microsoft/setup-msbuild@v1
+    - name: Setup Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.7'
+        architecture: 'x64'
     - name: Build ITK
       run: |
-        msbuild /?
         md ITK-build
         cd ITK-build
         cmake.exe -G "Visual Studio 16 2019" -DBUILD_SHARED_LIBS=OFF -DBUILD_TESTING=OFF -DBUILD_EXAMPLES=OFF -DCMAKE_INSTALL_PREFIX=..\ITK-install ..\ITK
@@ -31,4 +35,4 @@ jobs:
     - name: Install charm-gems
       run: |
         set ITK_DIR=ITK-install
-        python3.7 setup.py install
+        python setup.py install
