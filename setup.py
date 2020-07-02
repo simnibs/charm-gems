@@ -19,8 +19,8 @@ class build_ext_(build_ext):
             subprocess.run([
                 'cmake',
                 f'-DPYTHON_EXECUTABLE={sys.executable}',
-                f'-B{tmpdir}'
-                '.'],
+                f'-B{tmpdir}',
+                '-H.'],
                 check=True
             )
             if sys.platform == 'win32':
