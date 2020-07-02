@@ -12,10 +12,17 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+      
+    - name: Setup Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.7'
+
     - name: Checkout submodules
       run: | 
         git submodule init
         git submodule update
+
     - name: Build ITK
       run: |
         export MACOSX_DEPLOYMENT_TARGET=10.9
@@ -29,7 +36,18 @@ jobs:
             ../ITK
         make install
         cd ..
-    - name: Install charm-gems
+
+    - name: Build charm-gems
       run: |
         export MACOSX_DEPLOYMENT_TARGET=10.9
-        ITK_DIR=ITK-install python3.7 setup.py install
+        ITK_DIR=ITK-install python setup.py bdist_wheel
+        
+    - name: Test install and import
+      run: |
+        python -m pip install charm-gems -f dist/
+        python -c 'import charm_gems'
+
+    - name: Upload artifact
+      uses: kittaakos/upload-artifact-as-is@v0
+      with:
+        path: dist/*.whl
