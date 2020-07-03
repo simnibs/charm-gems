@@ -1,0 +1,53 @@
+name: Linux Build
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: quay.io/pypa/manylinux2014_x86_64:latest
+
+    steps:
+    - uses: actions/checkout@v2
+      
+    - name: Checkout submodules
+      run: | 
+        git submodule init
+        git submodule update
+
+    - name: Install CMake and Zlib
+      run: | 
+        yum install -y cmake3 zlib-devel
+        ln -s /usr/bin/cmake3 /usr/bin/cmake
+
+
+    - name: Build ITK
+      run: |
+        mkdir ITK-build
+        cd ITK-build
+        cmake \
+            -DBUILD_SHARED_LIBS=OFF \
+            -DBUILD_TESTING=OFF \
+            -DBUILD_EXAMPLES=OFF \
+            -DCMAKE_INSTALL_PREFIX=../ITK-install \
+            ../ITK
+        make install
+        cd ..
+ 
+    - name: Build charm-gems and test import
+      run: |
+        ITK_DIR=ITK-install $PYTHON_PATH setup.py bdist_wheel
+        $PYTHON_PATH -m auditwheel repair dist/*.whl
+        $PYTHON_PATH -m pip install charm-gems -f wheelhouse/
+        $PYTHON_PATH -c 'import charm_gems'
+      env:
+        PYTHON_PATH: /opt/python/cp37-cp37m/bin/python
+
+    - name: Upload artifact
+      uses: kittaakos/upload-artifact-as-is@v0
+      with:
+        path: wheelhouse/*.whl
