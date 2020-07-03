@@ -25,9 +25,11 @@ jobs:
       run: |
         md ITK-build
         cd ITK-build
-        cmake.exe -G "Visual Studio 16 2019" -DBUILD_SHARED_LIBS=OFF -DBUILD_TESTING=OFF -DBUILD_EXAMPLES=OFF -DCMAKE_INSTALL_PREFIX=..\ITK-install ..\ITK
+        cmake.exe -G "Visual Studio 16 2019" -DBUILD_SHARED_LIBS=OFF -DBUILD_TESTING=OFF -DBUILD_EXAMPLES=OFF ..\ITK
         msbuild INSTALL.vcxproj
         cd ..
+      shell: cmd
+
     - name: Install zlib
       run: |
          powershell -Command "(New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/horta/zlib.install/master/install.bat', 'install.bat')"
@@ -35,14 +37,8 @@ jobs:
          
     - name: Build charm-gems wheel
       run: |
-        dir .\
-        dir .\ITK-install
-        echo %ITK_DIR%
         python -m pip install --user --upgrade setuptools wheel
         python setup.py bdist_wheel
-      shell: cmd
-      env:
-        ITK_DIR: ITK-install
 
     - name: Test install and import
       run: |
