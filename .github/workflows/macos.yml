@@ -40,6 +40,7 @@ jobs:
     - name: Build charm-gems
       run: |
         export MACOSX_DEPLOYMENT_TARGET=10.9
+        python -m pip install --user --upgrade setuptools wheel
         ITK_DIR=ITK-install python setup.py bdist_wheel
         
     - name: Test install and import
