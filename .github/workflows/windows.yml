@@ -35,10 +35,14 @@ jobs:
          
     - name: Build charm-gems wheel
       run: |
-        set ITK_DIR=ITK-install
+        dir .\
+        dir .\ITK-install
+        echo %ITK_DIR%
         python -m pip install --user --upgrade setuptools wheel
         python setup.py bdist_wheel
       shell: cmd
+      env:
+        ITK_DIR: ITK-install
 
     - name: Test install and import
       run: |
