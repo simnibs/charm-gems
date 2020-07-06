@@ -42,6 +42,7 @@ jobs:
             -DBUILD_SHARED_LIBS=OFF \
             -DBUILD_TESTING=OFF \
             -DBUILD_EXAMPLES=OFF \
+            -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_INSTALL_PREFIX=../ITK-install \
             ../ITK
         make install

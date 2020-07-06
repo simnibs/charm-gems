@@ -15,6 +15,7 @@ git submodule update
 * Python >= 3.7
 * CMake
 * Make (Linux/MacOS)
+* Visual Studio (Windows)
 * ZLib
 
 ## Instructios
@@ -28,6 +29,7 @@ cmake \
     -DBUILD_SHARED_LIBS=OFF \
     -DBUILD_TESTING=OFF \
     -DBUILD_EXAMPLES=OFF \
+    -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=../ITK-install \
     ../ITK
 make install
@@ -38,20 +40,19 @@ cd ..
 ```
 ITK_DIR=ITK-install python setup.py install
 ```
-### Windows (Visual Studio 2019)
+### Windows (Tested on Visual Studio 2019)
 1. Build ITK
 ```
 md ITK-build
 cd ITK-build
 cmake.exe ^
-    -G "Visual Studio 16 2019" ^
     -DBUILD_SHARED_LIBS=OFF ^
     -DBUILD_TESTING=OFF ^
     -DBUILD_EXAMPLES=OFF ^
+    -DCMAKE_BUILD_TYPE=Release ^
     -DCMAKE_INSTALL_PREFIX=..\ITK-install ^
     ..\ITK
-"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat"
-msbuild INSTALL.vcxproj
+cmake --build . --config Release --target Install
 cd ..
 ```
 
@@ -62,7 +63,6 @@ powershell -Command "(New-Object Net.WebClient).DownloadFile('https://raw.github
 
 3. Install charm-gems
 ```
-"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat"
 set ITK_DIR=ITK-install
 python setup.py install
 ``` 

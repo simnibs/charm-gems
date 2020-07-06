@@ -18,7 +18,7 @@ class build_ext_(build_ext):
         with tempfile.TemporaryDirectory() as tmpdir:
             cmake_call = [
                 'cmake',
-                '-DBUILD_TYPE=Release',
+                '-DCMAKE_BUILD_TYPE=Release',
                 f'-DPYTHON_EXECUTABLE={sys.executable}',
                 f'-B{tmpdir}',
                 '-H.'
@@ -31,19 +31,16 @@ class build_ext_(build_ext):
                     pass
                 else:
                     cmake_call += [f'-D{k}={path}']
-            print(cmake_call)
+            print(' '.join(cmake_call))
             subprocess.run(cmake_call, check=True)
             if sys.platform == 'win32':
-                try:
-                    subprocess.run(['msbuild', '/?'], check=True, capture_output=True)
-                except WindowsError:
-                    raise WindowsError(
-                        'Could not find msbuild, have you run vcvars64.bat?\n'
-                        r'eg:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat"'
-                        )
-                subprocess.run(['msbuild', os.path.join(tmpdir, 'ALL_BUILD.vcxproj')], check=True)
+                subprocess.run([
+                    'cmake', '--build', tmpdir,
+                    '--config', 'Release'],
+                    check=True
+                )
                 compiled_lib = glob.glob(os.path.join(
-                    package_root, 'gems_python', 'Debug', 'gemsbindings.*.pyd'
+                    package_root, 'gems_python', 'Release', 'gemsbindings.*.pyd'
                 ))
             else:
                 subprocess.run(['make', '-C', tmpdir], check=True)
