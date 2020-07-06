@@ -16,9 +16,6 @@ class build_ext_(build_ext):
         os.makedirs(os.path.join(self.build_lib, 'charm_gems'), exist_ok=True)
         package_root = os.path.abspath(os.path.dirname(__file__))
         with tempfile.TemporaryDirectory() as tmpdir:
-            print(os.environ['ITK_DIR'])
-            print(os.environ['ZLIB_INCLUDE_DIR'])
-            print(os.environ['ZLIB_LIBRARY'])
             cmake_call = [
                 'cmake',
                 '-DBUILD_TYPE=Release',

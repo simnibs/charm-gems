@@ -23,6 +23,16 @@ jobs:
         git submodule init
         git submodule update
 
+    - name: Build zlib
+      run: |
+         export MACOSX_DEPLOYMENT_TARGET=10.9
+         git clone https://github.com/madler/zlib.git
+         mkdir zlib-build
+         cd zlib-build
+         cmake ../zlib -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../zlib-install
+         make install
+         cd ..
+
     - name: Build ITK
       run: |
         export MACOSX_DEPLOYMENT_TARGET=10.9
@@ -41,7 +51,7 @@ jobs:
       run: |
         export MACOSX_DEPLOYMENT_TARGET=10.9
         python -m pip install --user --upgrade setuptools wheel
-        ITK_DIR=ITK-install python setup.py bdist_wheel
+        ITK_DIR=ITK-install ZLIB_INCLUDE_DIR=zlib-install/lib ZLIB_LIBRARY=zlib-install/lib/libz.a python setup.py bdist_wheel
         
     - name: Test install and import
       run: |
