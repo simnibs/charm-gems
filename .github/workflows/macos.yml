@@ -9,14 +9,21 @@ on:
 jobs:
   build:
     runs-on: macos-latest
+    env:
+      MACOSX_DEPLOYMENT_TARGET: 10.9
+      PYTHON_VERSION: python3.7
+      PYTHON_DOWNLOAD_URL: https://www.python.org/ftp/python/3.7.7/python-3.7.7-macosx10.9.pkg
 
     steps:
     - uses: actions/checkout@v2
-      
-    - name: Setup Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.7'
+    
+    # Download and install Python instead of using the setup_python
+    # as the python in OSX was compiled in 10.14, which means that the wheels
+    # are incompatible with older MacOS versions
+    - name: Download and install Python
+      run: |
+        curl $PYTHON_DOWNLOAD_URL --output python_installer.pkg
+        sudo installer -pkg python_installer.pkg -target /
 
     - name: Checkout submodules
       run: | 
@@ -25,7 +32,6 @@ jobs:
 
     - name: Build zlib
       run: |
-         export MACOSX_DEPLOYMENT_TARGET=10.9
          git clone https://github.com/madler/zlib.git
          mkdir zlib-build
          cd zlib-build
@@ -35,7 +41,6 @@ jobs:
 
     - name: Build ITK
       run: |
-        export MACOSX_DEPLOYMENT_TARGET=10.9
         mkdir ITK-build
         cd ITK-build
         cmake \
@@ -50,10 +55,13 @@ jobs:
 
     - name: Build charm-gems
       run: |
-        export MACOSX_DEPLOYMENT_TARGET=10.9
-        python -m pip install --user --upgrade setuptools wheel
-        ITK_DIR=ITK-install ZLIB_INCLUDE_DIR=zlib-install/lib ZLIB_LIBRARY=zlib-install/lib/libz.a python setup.py bdist_wheel
-        
+        $PYTHON_VERSION -m pip install --user --upgrade setuptools wheel
+        $PYTHON_VERSION setup.py bdist_wheel
+      env:
+        ITK_DIR: ITK-install
+        ZLIB_INCLUDE_DIR: zlib-install/lib
+        ZLIB_LIBRARY: zlib-install/lib/libz.a
+
     - name: Test install and import
       run: |
         python -m pip install charm-gems -f dist/
