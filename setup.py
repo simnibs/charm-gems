@@ -16,13 +16,26 @@ class build_ext_(build_ext):
         os.makedirs(os.path.join(self.build_lib, 'charm_gems'), exist_ok=True)
         package_root = os.path.abspath(os.path.dirname(__file__))
         with tempfile.TemporaryDirectory() as tmpdir:
-            subprocess.run([
+            print(os.environ['ITK_DIR'])
+            print(os.environ['ZLIB_INCLUDE_DIR'])
+            print(os.environ['ZLIB_LIBRARY'])
+            cmake_call = [
                 'cmake',
+                '-DBUILD_TYPE=Release',
                 f'-DPYTHON_EXECUTABLE={sys.executable}',
                 f'-B{tmpdir}',
-                '-H.'],
-                check=True
-            )
+                '-H.'
+            ]
+            # Pass environment variables to CMake
+            for k in ['ITK_DIR', 'ZLIB_INCLUDE_DIR', 'ZLIB_LIBRARY']:
+                try:
+                    path = os.path.abspath(os.environ[k].replace('"', ''))
+                except KeyError:
+                    pass
+                else:
+                    cmake_call += [f'-D{k}={path}']
+            print(cmake_call)
+            subprocess.run(cmake_call, check=True)
             if sys.platform == 'win32':
                 try:
                     subprocess.run(['msbuild', '/?'], check=True, capture_output=True)
