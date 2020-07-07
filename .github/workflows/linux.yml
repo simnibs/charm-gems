@@ -58,7 +58,7 @@ jobs:
       if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
       run: |
         $PYTHON -m pip install twine
-        $PYTHON -m twine upload --repository testpypi wheelhouse/*.whl -u __token__ -p "$PASSWORD"
+        $PYTHON -m twine upload wheelhouse/*.whl -u __token__ -p "$PASSWORD"
       env:
         PASSWORD: ${{ secrets.PYPI_TOKEN }}
         PYTHON: /opt/python/cp38-cp38/bin/python
