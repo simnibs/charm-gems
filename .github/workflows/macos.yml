@@ -13,8 +13,6 @@ jobs:
     runs-on: macos-latest
     env:
       MACOSX_DEPLOYMENT_TARGET: 10.9
-      PYTHON_VERSION: python3.7
-      PYTHON_DOWNLOAD_URL: https://www.python.org/ftp/python/3.7.7/python-3.7.7-macosx10.9.pkg
 
     steps:
     - uses: actions/checkout@v2
@@ -70,12 +68,12 @@ jobs:
 
     - name: Build charm-gems
       run: |
-        .github/workflows/macos_build.sh python3.6
-        .github/workflows/macos_build.sh python3.7
-        .github/workflows/macos_build.sh python3.8
+        .github/workflows/macos_build.sh /Library/Frameworks/Python.framework/Versions/3.6/bin/python3
+        .github/workflows/macos_build.sh /Library/Frameworks/Python.framework/Versions/3.7/bin/python3
+        .github/workflows/macos_build.sh /Library/Frameworks/Python.framework/Versions/3.8/bin/python3
       env:
         ITK_DIR: ITK-install
-        ZLIB_INCLUDE_DIR: zlib-install/lib
+        ZLIB_INCLUDE_DIR: zlib-install/include
         ZLIB_LIBRARY: zlib-install/lib/libz.a
 
     - name: Upload artifact

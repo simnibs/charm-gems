@@ -46,6 +46,7 @@ jobs:
         .github/workflows/linux_build.sh /opt/python/cp36-cp36m/bin/python
         .github/workflows/linux_build.sh /opt/python/cp37-cp37m/bin/python
         .github/workflows/linux_build.sh /opt/python/cp38-cp38/bin/python
+        auditwheel repair dist/*.whl
       env:
         ITK_DIR: ITK-install
 
