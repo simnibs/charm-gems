@@ -1,24 +1,35 @@
 # charm-gems
 
-## Preparation
-This repostiroy uses submodules. To start it, please use
+[![PyPI version](https://badge.fury.io/py/charm-gems.svg)](https://badge.fury.io/py/charm-gems) ![Linux Build](https://github.com/simnibs/charm-gems/workflows/Linux%20Build/badge.svg)  ![MacOS Build](https://github.com/simnibs/charm-gems/workflows/MacOS%20Build/badge.svg) ![Windows Build](https://github.com/simnibs/charm-gems/workflows/Windows%20Build/badge.svg)
+
+
+## Installation
+
+The compiled charm-gems library is avalaibles via pip ≥ 19.3, for python 3.6, 3.7 and 3.8
+
+```bash
+pip install --upgrade pip
+pip install charm-gems
+```
+
+## Manual Installation
+
+
+### Requirements
+* A C++ compiler compatible with C++ 11
+* Python ≥ 3.6
+* CMake
+* Make (Linux/MacOS)
+* Visual Studio (Windows)
+* zlib (for windows, see https://github.com/horta/zlib.install)
+
+### Preparation
+This repostiroy uses submodules. To start it, use
 
 ```bash
 git submodule init
 git submodule update
 ```
-
-## Installing
-
-## Requirements
-* A C++ compiler compatible with C++ 11
-* Python >= 3.7
-* CMake
-* Make (Linux/MacOS)
-* Visual Studio (Windows)
-* ZLib
-
-## Instructios
 
 ### Linux/MacOS
 1. Build ITK
@@ -56,12 +67,7 @@ cmake --build . --config Release --target Install
 cd ..
 ```
 
-2. Install zlib (in an administrator prompt)
-```
-powershell -Command "(New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/horta/zlib.install/master/install.bat', 'install.bat')"; ./install.bat
-```
-
-3. Install charm-gems
+2. Install charm-gems
 ```
 set ITK_DIR=ITK-install
 python setup.py install
