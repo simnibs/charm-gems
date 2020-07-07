@@ -49,7 +49,8 @@ jobs:
         python setup.py bdist_wheel
         python -m pip install charm-gems -f .\dist\
         python -c 'import charm_gems'
-        rm charm_gems\*.pyd gems_python\Releases\*.pyd
+        rm charm_gems\*.pyd
+        rm gems_python\Releases\*.pyd
       env:
         ZLIB_INCLUDE_DIR: .\zlib-install\include
         ZLIB_LIBRARY: .\zlib-install\lib\zlibstatic.lib
@@ -64,7 +65,8 @@ jobs:
         python setup.py bdist_wheel
         python -m pip install charm-gems -f .\dist\
         python -c 'import charm_gems'
-        rm charm_gems\*.pyd gems_python\Releases\*.pyd
+        rm charm_gems\*.pyd
+        rm gems_python\Releases\*.pyd
       env:
         ZLIB_INCLUDE_DIR: .\zlib-install\include
         ZLIB_LIBRARY: .\zlib-install\lib\zlibstatic.lib
@@ -79,7 +81,8 @@ jobs:
         python setup.py bdist_wheel
         python -m pip install charm-gems -f .\dist\
         python -c 'import charm_gems'
-        rm charm_gems\*.pyd gems_python\Releases\*.pyd
+        rm charm_gems\*.pyd
+        rm gems_python\Releases\*.pyd
       env:
         ZLIB_INCLUDE_DIR: .\zlib-install\include
         ZLIB_LIBRARY: .\zlib-install\lib\zlibstatic.lib
