@@ -3,6 +3,8 @@ name: MacOS Build
 on:
   push:
     branches: [ master ]
+    tags:
+      - v*
   pull_request:
     branches: [ master ]
 
@@ -22,8 +24,21 @@ jobs:
     # are incompatible with older MacOS versions
     - name: Download and install Python
       run: |
-        curl $PYTHON_DOWNLOAD_URL --output python_installer.pkg
+        curl \
+          https://www.python.org/ftp/python/3.6.8/python-3.6.8-macosx10.9.pkg \
+          --output python_installer.pkg
         sudo installer -pkg python_installer.pkg -target /
+
+        curl \
+          https://www.python.org/ftp/python/3.7.7/python-3.7.7-macosx10.9.pkg \
+          --output python_installer.pkg
+        sudo installer -pkg python_installer.pkg -target /
+
+        curl \
+          https://www.python.org/ftp/python/3.8.3/python-3.8.3-macosx10.9.pkg \
+          --output python_installer.pkg
+        sudo installer -pkg python_installer.pkg -target /
+
 
     - name: Checkout submodules
       run: | 
@@ -55,19 +70,23 @@ jobs:
 
     - name: Build charm-gems
       run: |
-        $PYTHON_VERSION -m pip install --user --upgrade setuptools wheel
-        $PYTHON_VERSION setup.py bdist_wheel
+        .github/workflows/macos_build.sh python3.6
+        .github/workflows/macos_build.sh python3.7
+        .github/workflows/macos_build.sh python3.8
       env:
         ITK_DIR: ITK-install
         ZLIB_INCLUDE_DIR: zlib-install/lib
         ZLIB_LIBRARY: zlib-install/lib/libz.a
 
-    - name: Test install and import
-      run: |
-        $PYTHON_VERSION -m pip install charm-gems -f dist/
-        $PYTHON_VERSION -c 'import charm_gems'
-
     - name: Upload artifact
       uses: kittaakos/upload-artifact-as-is@v0
       with:
         path: dist/*.whl
+
+    - name: Upload to PyPI
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+        uses: pypa/gh-action-pypi-publish@master
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_TOKEN }}
+          repository_url: https://test.pypi.org/legacy/

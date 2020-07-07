@@ -39,7 +39,6 @@ set(CMAKE_CXX_STANDARD 11)
 # --------------------------------------------------
 
 # initialize pybind for python wrapping
-set(PYBIND11_PYTHON_VERSION 3.7)
 add_subdirectory(pybind11)
 
 

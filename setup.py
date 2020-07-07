@@ -62,7 +62,7 @@ class build_ext_(build_ext):
 
 setup(
     name='charm_gems',
-    version=__version__,
+    version=open('VERSION').readlines()[-1].strip(),
     description='Something descriptive',
     url='https://github.com/simnibs/charm-gems',
     author='Oula Puonti and Koen Van Leemput',

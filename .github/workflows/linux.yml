@@ -3,6 +3,8 @@ name: Linux Build
 on:
   push:
     branches: [ master ]
+    tags:
+      - v*
   pull_request:
     branches: [ master ]
 
@@ -39,16 +41,24 @@ jobs:
         make install
         cd ..
  
-    - name: Build charm-gems and test import
+    - name: Build charm-gems
       run: |
-        ITK_DIR=ITK-install $PYTHON_PATH setup.py bdist_wheel
-        $PYTHON_PATH -m auditwheel repair dist/*.whl
-        $PYTHON_PATH -m pip install charm-gems -f wheelhouse/
-        $PYTHON_PATH -c 'import charm_gems'
+        .github/workflows/linux_build.sh /opt/python/cp36-cp36m/bin/python
+        .github/workflows/linux_build.sh /opt/python/cp37-cp37m/bin/python
+        .github/workflows/linux_build.sh /opt/python/cp38-cp38/bin/python
       env:
-        PYTHON_PATH: /opt/python/cp37-cp37m/bin/python
+        ITK_DIR: ITK-install
 
     - name: Upload artifact
       uses: kittaakos/upload-artifact-as-is@v0
       with:
         path: wheelhouse/*.whl
+
+    - name: Upload to PyPI
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+        uses: pypa/gh-action-pypi-publish@master
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_TOKEN }}
+          repository_url: https://test.pypi.org/legacy/
+          packages_dir: wheelhouse
