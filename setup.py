@@ -63,12 +63,14 @@ class build_ext_(build_ext):
 setup(
     name='charm_gems',
     version=open('VERSION').readlines()[-1].strip(),
-    description='Something descriptive',
+    description='Python bindings of the gems segmentation package.',
     url='https://github.com/simnibs/charm-gems',
-    author='Oula Puonti and Koen Van Leemput',
+    author='Koen Van Leemput, Oula Puonti and Juan Eugenio Iglesias',
     author_email='oulap@drcmr.dk',
     packages=['charm_gems'],
     license='GPL3',
+    long_description=open('README.md').read(),
+    long_description_content_type='text/markdown',
     # We define ext_modules to trigger a build_ext run
     ext_modules=[
         Extension(
