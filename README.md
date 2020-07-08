@@ -2,14 +2,19 @@
 
 [![PyPI version](https://badge.fury.io/py/charm-gems.svg)](https://badge.fury.io/py/charm-gems) ![Linux Build](https://github.com/simnibs/charm-gems/workflows/Linux%20Build/badge.svg)  ![MacOS Build](https://github.com/simnibs/charm-gems/workflows/MacOS%20Build/badge.svg) ![Windows Build](https://github.com/simnibs/charm-gems/workflows/Windows%20Build/badge.svg)
 
-
+This repository contains the gems C++ code and python bindings used in Freesurfer's Sequence-Adaptive Multimodal SEGmentation ([SAMSEG](https://github.com/freesurfer/freesurfer/tree/dev/python/freesurfer/samseg)) ([Puonti et al., NeuroImage, 2016](https://www.sciencedirect.com/science/article/pii/S1053811916304724)) and in SimNIBS 4.0 Complete Head Anatomy Reconstruction Method (CHARM) ([Puonti et al., NeuroImage, 2020](https://www.sciencedirect.com/science/article/pii/S1053811920305309)) to create individualized head models for electric field simulations.
 ## Installation
 
-The compiled charm-gems library is avalaibles via pip ≥ 19.3, for python 3.6, 3.7 and 3.8
+The compiled charm-gems library is available via pip ≥ 19.3, for python 3.6, 3.7 and 3.8
 
 ```bash
 pip install --upgrade pip
 pip install charm-gems
+```
+Afterwards the package can be imported by calling
+
+```python
+import charm_gems as gems
 ```
 
 ## Manual Installation
@@ -24,7 +29,7 @@ pip install charm-gems
 * zlib (for windows, see https://github.com/horta/zlib.install)
 
 ### Preparation
-This repostiroy uses submodules. To start it, use
+This repository uses submodules. To start it, use
 
 ```bash
 git submodule init
