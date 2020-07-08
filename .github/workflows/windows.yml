@@ -10,7 +10,7 @@ on:
 jobs:
   build:
     runs-on: windows-2019
-    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+    if: ${{ startsWith(github.ref, 'refs/tags') || !contains(github.event.head_commit.message, '[skip ci]') }}
 
     steps:
     - uses: actions/checkout@v2
@@ -94,7 +94,7 @@ jobs:
 
 
     - name: Upload to PyPI
-      if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+      if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags') }}
       run: |
         python -m pip install twine
         python -m twine upload .\dist\*.whl -u __token__ -p "$env:PASSWORD"
