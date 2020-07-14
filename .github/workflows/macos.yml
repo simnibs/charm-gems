@@ -79,8 +79,9 @@ jobs:
         ZLIB_LIBRARY: zlib-install/lib/libz.a
 
     - name: Upload artifact
-      uses: kittaakos/upload-artifact-as-is@v0
+      uses: actions/upload-artifact@v2
       with:
+        name: macos-wheels
         path: dist/*.whl
 
     - name: Upload to PyPI

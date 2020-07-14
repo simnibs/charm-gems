@@ -88,10 +88,10 @@ jobs:
         ZLIB_LIBRARY: .\zlib-install\lib\zlibstatic.lib
 
     - name: Upload artifact
-      uses: kittaakos/upload-artifact-as-is@v0
+      uses: actions/upload-artifact@v2
       with:
+        name: windows-wheels
         path: .\dist\*.whl
-
 
     - name: Upload to PyPI
       if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags') }}
