@@ -7,14 +7,14 @@ import glob
 import subprocess
 import tempfile
 
-__version__ = '1.0.0'
-
 # RUN with ITK_DIR="PATH_TO_ITK" python setup.py
 
+# Replace build-ext to run CMake in order to build the bindings
 class build_ext_(build_ext):
     def run(self):
         os.makedirs(os.path.join(self.build_lib, 'charm_gems'), exist_ok=True)
         package_root = os.path.abspath(os.path.dirname(__file__))
+        # Run CMAKE
         with tempfile.TemporaryDirectory() as tmpdir:
             cmake_call = [
                 'cmake',
@@ -33,6 +33,7 @@ class build_ext_(build_ext):
                     cmake_call += [f'-D{k}={path}']
             print(' '.join(cmake_call))
             subprocess.run(cmake_call, check=True)
+            # Run Make
             if sys.platform == 'win32':
                 subprocess.run([
                     'cmake', '--build', tmpdir,
@@ -47,6 +48,7 @@ class build_ext_(build_ext):
                 compiled_lib = glob.glob(os.path.join(
                     package_root, 'gems_python', 'gemsbindings.cpython-*.so'
                 ))
+        # Move compiled libraries to build folder and charm_gems folder
         if len(compiled_lib) == 0:
             raise OSError(
                 'Something went wrong during compilation '
