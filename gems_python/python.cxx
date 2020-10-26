@@ -5,6 +5,7 @@
 #include "pyKvlMesh.h"
 #include "pyKvlOptimizer.h"
 #include "pyKvlTransform.h"
+#include "pyKvlImageRegisterer.h"
 #include "itkMultiThreader.h"
 
 namespace py = pybind11;
@@ -104,5 +105,32 @@ PYBIND11_MODULE(gemsbindings, m) {
             .def("transform", &KvlMeshCollection::Transform, py::return_value_policy::take_ownership)
             .def("write", &KvlMeshCollection::Write, py::return_value_policy::take_ownership)
             ;
+
+    py::class_<KvlImageRegisterer>(m,"KvlImageRegisterer")
+            .def(py::init<>())
+            .def(py::init<double,
+                int,
+                int,
+                int,
+                double,
+                double,
+                bool,
+                double,
+                std::string>(),
+                py::arg("translationScale"),
+                py::arg("numberOfIterations"),
+                py::arg("numberOfHistogramBins"),
+                py::arg("numberOfResolutionLevels"),
+                py::arg("backgroundGrayLevel"),
+                py::arg("smoothingSigma"),
+                py::arg("useCenterOfMassInitialization"),
+                py::arg("samplingRate"),
+                py::arg("interpolator"))
+            .def("read_images", &KvlImageRegisterer::ReadImages, py::arg("T1FileName"), py::arg("T2FileName"))
+            .def("initialize_transform", &KvlImageRegisterer::InitializeTransform)
+            .def("register", &KvlImageRegisterer::Register)
+            .def("write_out_result", &KvlImageRegisterer::WriteOutResults, py::arg("outputFileName"))
+            ;
+
      m.def("setGlobalDefaultNumberOfThreads", &setGlobalDefaultNumberOfThreads, "Sets the maximum number of threads for ITK.");
 }
