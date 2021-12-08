@@ -38,6 +38,11 @@ jobs:
           https://www.python.org/ftp/python/3.8.3/python-3.8.3-macosx10.9.pkg \
           --output python_installer.pkg
         sudo installer -pkg python_installer.pkg -target /
+        
+        curl \
+          https://www.python.org/ftp/python/3.9.5/python-3.9.5-macosx10.9.pkg \
+          --output python_installer.pkg
+        sudo installer -pkg python_installer.pkg -target /
 
 
     - name: Checkout submodules
@@ -73,6 +78,7 @@ jobs:
         .github/workflows/macos_build.sh /Library/Frameworks/Python.framework/Versions/3.6/bin/python3
         .github/workflows/macos_build.sh /Library/Frameworks/Python.framework/Versions/3.7/bin/python3
         .github/workflows/macos_build.sh /Library/Frameworks/Python.framework/Versions/3.8/bin/python3
+        .github/workflows/macos_build.sh /Library/Frameworks/Python.framework/Versions/3.9/bin/python3
       env:
         ITK_DIR: ITK-install
         ZLIB_INCLUDE_DIR: zlib-install/include
