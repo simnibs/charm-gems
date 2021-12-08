@@ -86,6 +86,22 @@ jobs:
       env:
         ZLIB_INCLUDE_DIR: .\zlib-install\include
         ZLIB_LIBRARY: .\zlib-install\lib\zlibstatic.lib
+        
+    - name: Build charms-gems python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+        architecture: 'x64'
+    - run: |
+        python -m pip install --user --upgrade setuptools wheel
+        python setup.py bdist_wheel
+        python -m pip install charm-gems -f .\dist\
+        python -c 'import charm_gems'
+        rm charm_gems\*.pyd
+        rm gems_python\Release\*.pyd
+      env:
+        ZLIB_INCLUDE_DIR: .\zlib-install\include
+        ZLIB_LIBRARY: .\zlib-install\lib\zlibstatic.lib
 
     - name: Upload artifact
       uses: actions/upload-artifact@v2
