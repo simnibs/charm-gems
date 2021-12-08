@@ -64,7 +64,6 @@ set(SOURCES
   kvlHistogrammer.cxx
   kvlMutualInformationCostAndGradientCalculator.cxx
   kvlAtlasMeshJacobianDeterminantDrawer.cxx
-  kvlRegisterImages.cxx
 )
 
 # gems libary

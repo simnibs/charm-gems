@@ -1,3 +1,6 @@
+#ifndef kvlRegisterImages_hxx
+#define kvlRegisterImages_hxx
+
 #include "kvlRegisterImages.h"
 #include "itkImageFileReader.h"
 #include "itkCenteredTransformInitializer.h"
@@ -16,28 +19,31 @@ namespace kvl
 //
 //
 //
-RegisterImages
+template< typename TransformationType, typename MetricType >
+RegisterImages<TransformationType, MetricType>
 ::RegisterImages()
 {
     m_FixedImage = 0;
     m_MovingImage = 0;
-    m_InitialTransform = TransformType::New();
+    m_InitialTransform = TransformationType::New();
     m_InitialTransform->SetIdentity();
-
+    m_FinalTransform = 0;
+    //This can be changed using the setter later on
+    m_CenterOfMass = false;
+    m_Metric = MetricType::New();
     m_TranslationScale = 0.0001;
     m_NumberOfIterations = 100;
-    m_NumberOfHistogramBins = 50;
-    m_NumberOfLevels = 3;
     m_BackgroundGrayLevel = 0;
     m_SmoothingSigmas = 1;
-    m_CenterOfMass = false;
     m_SamplingPercentage = 0.5;
     m_Interpolator = "b";
-    m_FinalTransform = 0;
+    m_ShrinkScales.push_back(2.0);
+    m_ShrinkScales.push_back(1.0);
+    m_ShrinkScales.push_back(0.0);
 }
 
-
-void RegisterImages
+template< typename TransformationType, typename MetricType >
+void RegisterImages<TransformationType, MetricType>
 ::ReadImages(const char* fileNameT1, const char* fileNameT2)
 {
     //Read in the T1 image
@@ -56,46 +62,51 @@ void RegisterImages
     m_MovingImage = movingImageReader->GetOutput();
 }
 
-void RegisterImages
+
+
+template< typename TransformationType, typename MetricType >
+void RegisterImages<TransformationType, MetricType>
 ::InitializeTransform()
 {
-    typedef itk::CenteredTransformInitializer<TransformType, ImageType, ImageType> TransformInitializerType;
-    TransformInitializerType::Pointer initializer = TransformInitializerType::New();
+   typedef itk::CenteredTransformInitializer<TransformationType, ImageType, ImageType> TransformInitializerType;
+   typename TransformInitializerType::Pointer initializer = TransformInitializerType::New();
+   initializer->SetTransform(m_InitialTransform);
+   initializer->SetFixedImage(m_FixedImage);
+   initializer->SetMovingImage(m_MovingImage);
 
-    initializer->SetTransform(m_InitialTransform);
-    initializer->SetFixedImage(m_FixedImage);
-    initializer->SetMovingImage(m_MovingImage);
-
-    if(m_CenterOfMass)
-    {
+   if(m_CenterOfMass)
+   {
         initializer->MomentsOn();
-    }
-    else
-    {
+   }
+   else
+   {
         initializer->GeometryOn();
-    }
-    initializer->InitializeTransform();
+   }
+   initializer->InitializeTransform();
 
-    TransformType::MatrixType initialMatrix = m_InitialTransform->GetMatrix();
-    TransformType::OffsetType initialOffset = m_InitialTransform->GetOffset();
-    std::cout << "Initial matrix = " << std::endl
-              << initialMatrix << std::endl;
-    std::cout << "Initial offset = " << std::endl
-              << initialOffset << "\n"
-              << std::endl;
+   typename TransformationType::MatrixType initialMatrix = m_InitialTransform->GetMatrix();
+   typename TransformationType::OffsetType initialOffset = m_InitialTransform->GetOffset();
+   std::cout << "Initial matrix = " << std::endl
+             << initialMatrix << std::endl;
+   std::cout << "Initial offset = " << std::endl
+             << initialOffset << "\n"
+             << std::endl;
+
 }
 
-void RegisterImages
+
+template <typename TransformationType, typename MetricType>
+void RegisterImages<TransformationType, MetricType>
 ::RunRegistration()
 {
     //Set-up registration and optimization
-    RegistrationType::Pointer registration = RegistrationType::New();
+    typedef itk::ImageRegistrationMethodv4<ImageType, ImageType, TransformationType> RegistrationType;
+
+    typename RegistrationType::Pointer registration = RegistrationType::New();
     OptimizerType::Pointer optimizer = OptimizerType::New();
     registration->SetOptimizer(optimizer);
 
-    //And the metric
-    MetricType::Pointer metric = MetricType::New();
-    registration->SetMetric(metric);
+    registration->SetMetric(m_Metric);
 
     //Normalize images
     typedef itk::NormalizeImageFilter<ImageType,ImageType> NormalizeFilterType;
@@ -110,7 +121,7 @@ void RegisterImages
     //Feed the normalized images to the registration
     registration->SetFixedImage(fixedNormalizer->GetOutput());
     registration->SetMovingImage(movingNormalizer->GetOutput());
-    
+
     //Set the initial transform
     registration->SetInitialTransform(m_InitialTransform);
 
@@ -118,23 +129,27 @@ void RegisterImages
     std::cout << "   Moving image: " << registration->GetInitialTransform()->GetParameters() << std::endl;
     std::cout << "   Fixed image:  " << registration->GetInitialTransform()->GetFixedParameters() << "\n"
                 << std::endl;
-    //Set parameters for the optimizer
+
+    //Get the optimizer scales and set them
     OptimizerScalesType optimizerScales(m_InitialTransform->GetNumberOfParameters());
-    optimizerScales[0] = 1.0;
-    optimizerScales[1] = 1.0;
-    optimizerScales[2] = 1.0;
-    optimizerScales[3] = m_TranslationScale;
-    optimizerScales[4] = m_TranslationScale;
-    optimizerScales[5] = m_TranslationScale;
-    optimizer->SetScales(optimizerScales);
+    optimizerScales.fill(1.0);
+    //Fill in the last three elements with the translation scales
+    optimizerScales[optimizerScales.Size()-1] = m_TranslationScale;
+    optimizerScales[optimizerScales.Size()-2] = m_TranslationScale;
+    optimizerScales[optimizerScales.Size()-3] = m_TranslationScale;
+
+    std::cout << "Optimizer scales:" << std::endl;
+    std::cout << optimizerScales << std::endl;
     optimizer->SetNumberOfIterations(m_NumberOfIterations);
     optimizer->SetRelaxationFactor(0.5);
     optimizer->SetReturnBestParametersAndValue(true);
     optimizer->SetGradientMagnitudeTolerance(1e-4);
     optimizer->SetMinimumConvergenceValue(1e-4);
-    
+    optimizer->SetScales(optimizerScales);
+
+
     //Set sampling strategy
-    RegistrationType::MetricSamplingStrategyType samplingStrategy = RegistrationType::RANDOM;
+    typename RegistrationType::MetricSamplingStrategyType samplingStrategy = RegistrationType::RANDOM;
     registration->SetMetricSamplingStrategy(samplingStrategy);
     registration->SetMetricSamplingPercentage(m_SamplingPercentage);
 
@@ -142,39 +157,40 @@ void RegisterImages
     constexpr int randomNumberGeneratorSeed = 121213;
     registration->MetricSamplingReinitializeSeed(randomNumberGeneratorSeed);
 
-    metric->SetNumberOfHistogramBins(m_NumberOfHistogramBins);
 
     //Add the observer
     CommandIterationUpdate::Pointer observer = CommandIterationUpdate::New();
     optimizer->AddObserver(itk::IterationEvent(), observer);
 
     //Add number of levels
-    registration->SetNumberOfLevels(m_NumberOfLevels);
-    RegistrationType::ShrinkFactorsArrayType shrinkFactorsPerLevel;
-    shrinkFactorsPerLevel.SetSize(m_NumberOfLevels);
+    registration->SetNumberOfLevels(m_ShrinkScales.size());
+    typename RegistrationType::ShrinkFactorsArrayType shrinkFactorsPerLevel;
+    shrinkFactorsPerLevel.SetSize(m_ShrinkScales.size());
 
-    for (auto i = 0; i < m_NumberOfLevels; ++i)
+    for (auto i = 0; i < m_ShrinkScales.size(); ++i)
     {
-        shrinkFactorsPerLevel[i] = static_cast<unsigned long>(pow(2, m_NumberOfLevels - 1 - i));
+        shrinkFactorsPerLevel[i] = static_cast<unsigned long>(pow(2, m_ShrinkScales.at(i)));
     }
     registration->SetShrinkFactorsPerLevel(shrinkFactorsPerLevel);
-    
+
     // Set the smoothing sigmas for each level in terms of voxels.
     registration->SetSmoothingSigmasAreSpecifiedInPhysicalUnits(false);
-    RegistrationType::SmoothingSigmasArrayType smoothingSigmasPerLevel;
-    smoothingSigmasPerLevel.SetSize(m_NumberOfLevels);
-    for (auto i = 0; i < m_NumberOfLevels; ++i)
+    typename RegistrationType::SmoothingSigmasArrayType smoothingSigmasPerLevel;
+    smoothingSigmasPerLevel.SetSize(m_ShrinkScales.size());
+    for (auto i = 0; i < m_ShrinkScales.size(); ++i)
     {
-        smoothingSigmasPerLevel[i] = (m_SmoothingSigmas * shrinkFactorsPerLevel[i]) > 0 ? (m_SmoothingSigmas * shrinkFactorsPerLevel[i]) : 0;     
+        smoothingSigmasPerLevel[i] = (m_SmoothingSigmas * shrinkFactorsPerLevel[i]) > 0 ? (m_SmoothingSigmas * shrinkFactorsPerLevel[i]) : 0;
     }
 
     registration->SetSmoothingSigmasPerLevel(smoothingSigmasPerLevel);
 
+    std::cout<< "Metric:" << std::endl;
+    m_Metric->Print(std::cout, 0);
     // Create the Command observer and register it with the registration.
     typedef RegistrationInterfaceCommand<RegistrationType> CommandType;
-    CommandType::Pointer command = CommandType::New();
+    typename CommandType::Pointer command = CommandType::New();
     registration->AddObserver(itk::MultiResolutionIterationEvent(), command);
-    
+
     //  Trigger the registration process by calling \code{Update()}.
     try
     {
@@ -208,37 +224,28 @@ void RegisterImages
         exit(EXIT_FAILURE);
     }
 
-    const TransformType::ParametersType finalParameters =
+    const typename TransformationType::ParametersType finalParameters =
       registration->GetOutput()->Get()->GetParameters();
-    
-    const double versorX = finalParameters[0];
-    const double versorY = finalParameters[1];
-    const double versorZ = finalParameters[2];
-    const double finalTranslationX = finalParameters[3];
-    const double finalTranslationY = finalParameters[4];
-    const double finalTranslationZ = finalParameters[5];
+
     const unsigned int currentIterations = optimizer->GetCurrentIteration();
     const double bestValue = optimizer->GetValue();
 
-    // Print out results
-    std::cout << "Result = " << std::endl;
-    std::cout << "   Versor X      = " << versorX << std::endl;
-    std::cout << "   Versor Y      = " << versorY << std::endl;
-    std::cout << "   Versor Z      = " << versorZ << std::endl;
-    std::cout << "   Translation X = " << finalTranslationX << std::endl;
-    std::cout << "   Translation Y = " << finalTranslationY << std::endl;
-    std::cout << "   Translation Z = " << finalTranslationZ << std::endl;
-    std::cout << "   Iterations    = " << currentIterations << std::endl;
-    std::cout << "   Metric value  = " << bestValue << "\n"
-              << std::endl;
-    
-    m_FinalTransform = TransformType::New();
+    m_FinalTransform = TransformationType::New();
     m_FinalTransform->SetFixedParameters(
       registration->GetOutput()->Get()->GetFixedParameters());
     m_FinalTransform->SetParameters(finalParameters);
+
+    // Print out results
+    std::cout << "RESULTS:" << std::endl;
+    std::cout << "   Iterations    = " << currentIterations << std::endl;
+    std::cout << "   Metric value  = " << bestValue << std::endl;
+    std::cout << "   Final transformation: " << std::endl;
+    std::cout << m_FinalTransform << std::endl;
+
 }
 
-void RegisterImages
+template <typename TransformationType, typename MetricType>
+void RegisterImages<TransformationType, MetricType>
 ::WriteOutputImage(std::string outImageFile, ImageType::Pointer resampledImage)
 {
   typedef itk::CastImageFilter<ImageType, ImageType> CastFilterType;
@@ -256,7 +263,8 @@ void RegisterImages
             << std::endl;
 }
 
-void RegisterImages
+template <typename TransformationType, typename MetricType>
+void RegisterImages<TransformationType, MetricType>
 ::WriteOutResults(std::string outImageFile)
 {
     typedef itk::ResampleImageFilter<ImageType, ImageType> ResampleFilterType;
@@ -303,7 +311,6 @@ void RegisterImages
 
 
 }
-
-RegisterImages
-::~RegisterImages(){}
 }
+
+#endif

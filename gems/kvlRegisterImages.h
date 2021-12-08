@@ -1,12 +1,11 @@
-#ifndef __kvlRegisterImages_h
-#define __kvlRegisterImages_h
+#ifndef kvlRegisterImages_h
+#define kvlRegisterImages_h
 
 #include "itkImageRegistrationMethodv4.h"
 #include "itkImage.h"
-#include "itkVersorRigid3DTransform.h"
 #include "itkRegularStepGradientDescentOptimizerv4.h"
 #include "itkCommand.h"
-#include "itkMattesMutualInformationImageToImageMetricv4.h"
+#include "itkCenteredTransformInitializer.h"
 
 namespace kvl
 {
@@ -175,6 +174,7 @@ public:
   }
 };
 
+template< typename InputTransformationType, typename InputMetricType >
 class RegisterImages: public itk::Object
 {
 public :
@@ -192,14 +192,19 @@ public :
   itkTypeMacro( RegisterImages, itk::Object );
 
   /** Some typedefs */
-  //typedef itk::Image< unsigned short, 3 >  ImageType;
   typedef itk::Image< double, 3 >  ImageType;
-  typedef itk::VersorRigid3DTransform< double>  TransformType;
   typedef itk::RegularStepGradientDescentOptimizerv4<double> OptimizerType;
   typedef OptimizerType::ScalesType OptimizerScalesType;
-  typedef itk::ImageRegistrationMethodv4<ImageType, ImageType, TransformType> RegistrationType;
-  typedef itk::MattesMutualInformationImageToImageMetricv4<ImageType, ImageType> MetricType;
-  // Read  
+  typedef InputTransformationType TransformationType;
+  typedef InputMetricType MetricType;
+
+  // Constructor
+  RegisterImages();
+
+  //Destructor
+  ~RegisterImages(){};
+
+  // Read
   void ReadImages(const char* fileNameT1, const char* fileNameT2);
 
   //Initialize the registration
@@ -211,6 +216,17 @@ public :
 
   void WriteOutputImage(std::string outImageFile, ImageType::Pointer resampledImage);
 
+  typename TransformationType::Pointer GetFinalTransformation()
+  {
+    return m_FinalTransform;
+  }
+
+  typename MetricType::Pointer GetMetric()
+  {
+    return m_Metric;
+  }
+
+
   void SetTranslationScale(double transScale)
   {
     m_TranslationScale = transScale;
@@ -221,14 +237,9 @@ public :
     m_NumberOfIterations = numIter;
   }
 
-  void SetNumberOfLevels(int numLevels)
+  void SetShrinkScales(std::vector<double> shrinkScales)
   {
-    m_NumberOfLevels = numLevels;
-  }
-
-  void SetNumberOfHistogramBins(int numLevels)
-  {
-    m_NumberOfHistogramBins = numLevels;
+    m_ShrinkScales = shrinkScales;
   }
 
   void SetBackgroundGrayLevel(double bgLevel)
@@ -257,8 +268,6 @@ public :
   }
 
 protected:
-  RegisterImages();
-  virtual ~RegisterImages();
 
 
 private:
@@ -267,23 +276,23 @@ private:
 
   ImageType::Pointer  m_FixedImage;
   ImageType::Pointer  m_MovingImage;
-
-  TransformType::Pointer m_InitialTransform;  
-  
+  typename TransformationType::Pointer m_InitialTransform;
   double m_TranslationScale;
+  std::vector<double> m_ShrinkScales;
   int m_NumberOfIterations;
-  int m_NumberOfHistogramBins;
-  int m_NumberOfLevels;
   double m_BackgroundGrayLevel;
   double m_SmoothingSigmas;
   bool m_CenterOfMass;
   double m_SamplingPercentage;
   std::string m_Interpolator;
-  TransformType::Pointer m_FinalTransform;
+  typename MetricType::Pointer m_Metric;
+  typename TransformationType::Pointer m_FinalTransform;
 };
 
 
 } // end namespace kvl
+
+#include "kvlRegisterImages.hxx"
 
 #endif
 
