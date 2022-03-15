@@ -169,7 +169,6 @@ void KvlImage::Write(std::string fileName, KvlTransform &transform) {
 
     } // End test if transform is given
 
-
     // Write it out
     typedef itk::ImageFileWriter< ImageType >  WriterType;
     WriterType::Pointer  writer = WriterType::New();

@@ -27,7 +27,7 @@ class KvlRigidRegistration {
     
         KvlRigidRegistration(double transScale, int numIter,
         int numHistBins, py::array_t<double> shrinkScales, double bgLevel,
-        double sigma, bool useCenterOfMass, double sampRate,
+        py::array_t<double> smoothSigmas, bool useCenterOfMass, double sampRate,
         std::string interpolator)
         {
         
@@ -38,13 +38,21 @@ class KvlRigidRegistration {
             for ( int scaleNum = 0; scaleNum < numScales; scaleNum++ ) {
             	 scales.push_back( scales.at(scaleNum) );
             }
+
+            py::buffer_info sigmas_info  = smoothSigmas.request();
+            const int numSigmas = sigmas_info.shape[0];
+            std::vector<double> sigmas;
+            
+            for ( int sigmaNum = 0; sigmaNum < numSigmas; sigmaNum++ ) {
+            	 sigmas.push_back( smoothSigmas.at(sigmaNum) );
+            }
             
             registerer = kvl::RegisterImages<RigidTransformType, MetricType>::New();
             registerer->SetTranslationScale(transScale);
             registerer->SetNumberOfIterations(numIter);
             registerer->SetShrinkScales(scales);
             registerer->SetBackgroundGrayLevel(bgLevel);
-            registerer->SetSmoothingSigmas(sigma);
+            registerer->SetSmoothingSigmas(sigmas);
             registerer->SetCenterOfMassInit(useCenterOfMass);
             registerer->SetSamplingPercentage(sampRate);
             registerer->SetInterpolator(interpolator);

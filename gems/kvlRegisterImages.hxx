@@ -31,15 +31,18 @@ RegisterImages<TransformationType, MetricType>
     //This can be changed using the setter later on
     m_CenterOfMass = false;
     m_Metric = MetricType::New();
-    m_TranslationScale = 0.0001;
+    m_TranslationScale = -100;
     m_NumberOfIterations = 100;
     m_BackgroundGrayLevel = 0;
-    m_SmoothingSigmas = 1;
     m_SamplingPercentage = 0.5;
     m_Interpolator = "b";
     m_ShrinkScales.push_back(2.0);
     m_ShrinkScales.push_back(1.0);
     m_ShrinkScales.push_back(0.0);
+    m_SmoothingSigmas.push_back(4.0);
+    m_SmoothingSigmas.push_back(2.0);
+    m_SmoothingSigmas.push_back(0.0);
+    
 }
 
 template< typename TransformationType, typename MetricType >
@@ -131,6 +134,11 @@ void RegisterImages<TransformationType, MetricType>
                 << std::endl;
 
     //Get the optimizer scales and set them
+    typedef itk::RegistrationParameterScalesFromPhysicalShift<MetricType> ScalesEstimatorType;
+    auto scalesEstimator = ScalesEstimatorType::New();
+    scalesEstimator->SetMetric(m_Metric);
+    scalesEstimator->SetTransformForward(true);
+    
     OptimizerScalesType optimizerScales(m_InitialTransform->GetNumberOfParameters());
     optimizerScales.fill(1.0);
     //Fill in the last three elements with the translation scales
@@ -138,15 +146,29 @@ void RegisterImages<TransformationType, MetricType>
     optimizerScales[optimizerScales.Size()-2] = m_TranslationScale;
     optimizerScales[optimizerScales.Size()-3] = m_TranslationScale;
 
-    std::cout << "Optimizer scales:" << std::endl;
-    std::cout << optimizerScales << std::endl;
+    // Set the other parameters of optimizer
+    optimizer->SetDoEstimateLearningRateOnce(false);
+    optimizer->SetDoEstimateLearningRateAtEachIteration(true);
+    // Software Guide : EndCodeSnippet
+ 
+    // Set the other parameters of optimizer
+    optimizer->SetLowerLimit(0);
+    optimizer->SetUpperLimit(2);
+    optimizer->SetEpsilon(0.2);
     optimizer->SetNumberOfIterations(m_NumberOfIterations);
-    optimizer->SetRelaxationFactor(0.5);
-    optimizer->SetReturnBestParametersAndValue(true);
-    optimizer->SetGradientMagnitudeTolerance(1e-4);
     optimizer->SetMinimumConvergenceValue(1e-4);
-    optimizer->SetScales(optimizerScales);
+    optimizer->SetConvergenceWindowSize(5);
+ 
 
+    if (m_TranslationScale > 0){
+       std::cout << "Using optimizer scales:" << std::endl;
+       std::cout << optimizerScales << std::endl;
+       optimizer->SetScales(optimizerScales);
+    }
+    else{
+       std::cout << "Using scales estimator." << std::endl;
+       optimizer->SetScalesEstimator(scalesEstimator);
+    }
 
     //Set sampling strategy
     typename RegistrationType::MetricSamplingStrategyType samplingStrategy = RegistrationType::RANDOM;
@@ -174,12 +196,12 @@ void RegisterImages<TransformationType, MetricType>
     registration->SetShrinkFactorsPerLevel(shrinkFactorsPerLevel);
 
     // Set the smoothing sigmas for each level in terms of voxels.
-    registration->SetSmoothingSigmasAreSpecifiedInPhysicalUnits(false);
+    registration->SetSmoothingSigmasAreSpecifiedInPhysicalUnits(true);
     typename RegistrationType::SmoothingSigmasArrayType smoothingSigmasPerLevel;
     smoothingSigmasPerLevel.SetSize(m_ShrinkScales.size());
     for (auto i = 0; i < m_ShrinkScales.size(); ++i)
     {
-        smoothingSigmasPerLevel[i] = (m_SmoothingSigmas * shrinkFactorsPerLevel[i]) > 0 ? (m_SmoothingSigmas * shrinkFactorsPerLevel[i]) : 0;
+        smoothingSigmasPerLevel[i] = m_SmoothingSigmas.at(i);
     }
 
     registration->SetSmoothingSigmasPerLevel(smoothingSigmasPerLevel);

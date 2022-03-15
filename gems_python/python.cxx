@@ -114,7 +114,7 @@ PYBIND11_MODULE(gemsbindings, m) {
                 int,
                 const py::array_t<double> &,
                 double,
-                double,
+                const py::array_t<double> &,
                 bool,
                 double,
                 std::string>(),
@@ -141,7 +141,7 @@ PYBIND11_MODULE(gemsbindings, m) {
                 int,
                 const py::array_t<double> &,
                 double,
-                double,
+                const py::array_t<double> &,
                 bool,
                 double,
                 std::string>(),
@@ -158,7 +158,7 @@ PYBIND11_MODULE(gemsbindings, m) {
             .def("initialize_transform", &KvlAffineRegistration::InitializeTransform)
             .def("register", &KvlAffineRegistration::Register)
             .def("write_out_result", &KvlAffineRegistration::WriteOutResults, py::arg("outputFileName"))
-            .def("get_transformation_matrix", &KvlAffineRegistration::GetFinalTransformation, py::return_value_policy::take_ownership)
+            .def("get_transformation_matrix", &KvlAffineRegistration::GetFinalTransformationMatrix, py::return_value_policy::take_ownership)
             ;
 
      m.def("setGlobalDefaultNumberOfThreads", &setGlobalDefaultNumberOfThreads, "Sets the maximum number of threads for ITK.");

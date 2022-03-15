@@ -3,7 +3,7 @@
 
 #include "itkImageRegistrationMethodv4.h"
 #include "itkImage.h"
-#include "itkRegularStepGradientDescentOptimizerv4.h"
+#include "itkConjugateGradientLineSearchOptimizerv4.h"
 #include "itkCommand.h"
 #include "itkCenteredTransformInitializer.h"
 
@@ -22,7 +22,7 @@ protected:
   CommandIterationUpdate(){};
 
 public:
-  typedef itk::RegularStepGradientDescentOptimizerv4<double> OptimizerType;
+  typedef itk::ConjugateGradientLineSearchOptimizerv4Template<double> OptimizerType;
   typedef const OptimizerType * OptimizerPointer;
 
   void
@@ -72,7 +72,7 @@ protected:
 public:
   typedef TRegistration RegistrationType;
   typedef RegistrationType * RegistrationPointer;
-  typedef itk::RegularStepGradientDescentOptimizerv4<double> OptimizerType;
+  typedef itk::ConjugateGradientLineSearchOptimizerv4Template<double> OptimizerType;
   typedef OptimizerType * OptimizerPointer;
 
   // Two arguments are passed to the \code{Execute()} method: the first
@@ -151,6 +151,7 @@ public:
     // the next level, the step length will simply start with the last value used
     // for the previous level. This will guarantee the continuity of the path
     // taken by the optimizer through the parameter space.
+    /*
     if (registration->GetCurrentLevel() == 0)
     {
       optimizer->SetLearningRate(16.00);
@@ -161,6 +162,7 @@ public:
       optimizer->SetLearningRate(optimizer->GetCurrentStepLength());
       optimizer->SetMinimumStepLength(optimizer->GetMinimumStepLength() * 0.1); //0.2
     }
+    */
   }
 
   // Define the version of the \code{Execute()} method accepting the input object
@@ -193,7 +195,8 @@ public :
 
   /** Some typedefs */
   typedef itk::Image< double, 3 >  ImageType;
-  typedef itk::RegularStepGradientDescentOptimizerv4<double> OptimizerType;
+  //typedef itk::RegularStepGradientDescentOptimizerv4<double> OptimizerType;
+  typedef itk::ConjugateGradientLineSearchOptimizerv4Template<double> OptimizerType; 
   typedef OptimizerType::ScalesType OptimizerScalesType;
   typedef InputTransformationType TransformationType;
   typedef InputMetricType MetricType;
@@ -247,9 +250,9 @@ public :
     m_BackgroundGrayLevel = bgLevel;
   }
 
-  void SetSmoothingSigmas(double sigma)
+  void SetSmoothingSigmas(std::vector<double> sigmas)
   {
-    m_SmoothingSigmas = sigma;
+    m_SmoothingSigmas = sigmas;
   }
 
   void SetCenterOfMassInit(bool useCenterOfMass)
@@ -281,7 +284,7 @@ private:
   std::vector<double> m_ShrinkScales;
   int m_NumberOfIterations;
   double m_BackgroundGrayLevel;
-  double m_SmoothingSigmas;
+  std::vector<double> m_SmoothingSigmas;
   bool m_CenterOfMass;
   double m_SamplingPercentage;
   std::string m_Interpolator;
