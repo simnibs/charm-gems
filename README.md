@@ -7,6 +7,7 @@ This repository contains the gems C++ code and python bindings used in Freesurfe
 
 The compiled charm-gems library is available via pip ≥ 19.3, for python 3.6, 3.7 and 3.8
 
+
 ```bash
 pip install --upgrade pip
 pip install charm-gems
