@@ -33,7 +33,7 @@ class KvlAffineRegistration {
         }
     
         KvlAffineRegistration(double transScale, int numIter,
-        int radius, py::array_t<double> shrinkScales, double bgLevel,
+        py::array_t<double> shrinkScales, double bgLevel,
         py::array_t<double> smoothSigmas, bool useCenterOfMass, double sampRate,
         std::string interpolator)
         {

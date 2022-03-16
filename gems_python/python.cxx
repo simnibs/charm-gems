@@ -138,7 +138,6 @@ PYBIND11_MODULE(gemsbindings, m) {
             .def(py::init<>())
             .def(py::init<double,
                 int,
-                int,
                 const py::array_t<double> &,
                 double,
                 const py::array_t<double> &,
@@ -147,7 +146,6 @@ PYBIND11_MODULE(gemsbindings, m) {
                 std::string>(),
                 py::arg("translationScale"),
                 py::arg("numberOfIterations"),
-                py::arg("neighborhoodRadius"),
                 py::arg("shrinkScales"),
                 py::arg("backgroundGrayLevel"),
                 py::arg("smoothingSigma"),
