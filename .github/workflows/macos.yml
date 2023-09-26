@@ -24,26 +24,30 @@ jobs:
     # are incompatible with older MacOS versions
     - name: Download and install Python
       run: |
-        curl \
-          https://www.python.org/ftp/python/3.8.9/python-3.8.9-macosx10.9.pkg \
-          --output python_installer.pkg
-        sudo installer -pkg python_installer.pkg -target /
+        # curl \
+        #   https://www.python.org/ftp/python/3.8.9/python-3.8.9-macosx10.9.pkg \
+        #   --output python_installer.pkg
+        # sudo installer -pkg python_installer.pkg -target /
 
-        curl \
-          https://www.python.org/ftp/python/3.9.9/python-3.9.9-macosx10.9.pkg \
-          --output python_installer.pkg
-        sudo installer -pkg python_installer.pkg -target /
+        # curl \
+        #   https://www.python.org/ftp/python/3.9.9/python-3.9.9-macosx10.9.pkg \
+        #   --output python_installer.pkg
+        # sudo installer -pkg python_installer.pkg -target /
 
-        curl \
-          https://www.python.org/ftp/python/3.10.9/python-3.10.9-macos11.pkg \
-          --output python_installer.pkg
-        sudo installer -pkg python_installer.pkg -target /
-        
-        curl \
-          https://www.python.org/ftp/python/3.11.5/python-3.11.5-macos11.pkg \
-          --output python_installer.pkg
-        sudo installer -pkg python_installer.pkg -target /
+        # curl \
+        #   https://www.python.org/ftp/python/3.10.9/python-3.10.9-macos11.pkg \
+        #   --output python_installer.pkg
+        # sudo installer -pkg python_installer.pkg -target /
 
+        # curl \
+        #   https://www.python.org/ftp/python/3.11.5/python-3.11.5-macos11.pkg \
+        #   --output python_installer.pkg
+        # sudo installer -pkg python_installer.pkg -target /
+
+        brew install python@3.8
+        brew install python@3.9
+        brew install python@3.10
+        brew install python@3.11
 
     - name: Checkout submodules
       run: | 
@@ -75,10 +79,14 @@ jobs:
 
     - name: Build charm-gems
       run: |
-        .github/workflows/macos_build.sh /Library/Frameworks/Python.framework/Versions/3.8/bin/python3
-        .github/workflows/macos_build.sh /Library/Frameworks/Python.framework/Versions/3.9/bin/python3
-        .github/workflows/macos_build.sh /Library/Frameworks/Python.framework/Versions/3.10/bin/python3
-        .github/workflows/macos_build.sh /Library/Frameworks/Python.framework/Versions/3.11/bin/python3
+        # .github/workflows/macos_build.sh /Library/Frameworks/Python.framework/Versions/3.8/bin/python3
+        # .github/workflows/macos_build.sh /Library/Frameworks/Python.framework/Versions/3.9/bin/python3
+        # .github/workflows/macos_build.sh /Library/Frameworks/Python.framework/Versions/3.10/bin/python3
+        # .github/workflows/macos_build.sh /Library/Frameworks/Python.framework/Versions/3.11/bin/python3
+        .github/workflows/macos_build.sh /usr/local/bin/python3.8
+        .github/workflows/macos_build.sh /usr/local/bin/python3.9
+        .github/workflows/macos_build.sh /usr/local/bin/python3.10
+        .github/workflows/macos_build.sh /usr/local/bin/python3.11
       env:
         ITK_DIR: ITK-install
         ZLIB_INCLUDE_DIR: zlib-install/include

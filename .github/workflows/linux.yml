@@ -18,10 +18,10 @@ jobs:
     - uses: actions/checkout@v2
       
     - name: Checkout submodules
-      run: | 
+      run: |
+        git config --global --add safe.directory /__w/charm-gems/charm-gems
         git submodule init
         git submodule update
-        git config --system --add safe.directory /__w/charm-gems/charm-gems
     - name: Install CMake and Zlib
       run: | 
         yum install -y cmake3 zlib-devel
