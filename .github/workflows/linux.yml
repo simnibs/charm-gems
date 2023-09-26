@@ -43,8 +43,8 @@ jobs:
  
     - name: Build charm-gems
       run: |
-        .github/workflows/linux_build.sh /opt/python/cp38-cp38m/bin/python
-        .github/workflows/linux_build.sh /opt/python/cp39-cp39m/bin/python
+        .github/workflows/linux_build.sh /opt/python/cp38-cp38/bin/python
+        .github/workflows/linux_build.sh /opt/python/cp39-cp39/bin/python
         .github/workflows/linux_build.sh /opt/python/cp310-cp310/bin/python
         .github/workflows/linux_build.sh /opt/python/cp311-cp311/bin/python
         ls dist/*.whl | xargs -n1 auditwheel repair
