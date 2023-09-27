@@ -11,7 +11,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: quay.io/pypa/manylinux2014_x86_64:latest
+    container: quay.io/pypa/manylinux2014_x86_64
     if: ${{ startsWith(github.ref, 'refs/tags') || !contains(github.event.head_commit.message, '[skip ci]') }}
 
     steps:
@@ -22,6 +22,13 @@ jobs:
         git config --global --add safe.directory /__w/charm-gems/charm-gems
         git submodule init
         git submodule update
+
+    - name: Download gcc 8 compilers
+      run: |
+       yum install -y centos-release-scl && \
+       yum-config-manager --enable rhel-server-rhscl-7-rpms && \
+       yum install -y devtoolset-8
+
     - name: Install CMake and Zlib
       run: | 
         yum install -y cmake3 zlib-devel
@@ -29,6 +36,9 @@ jobs:
 
     - name: Build ITK
       run: |
+
+        export CC=/opt/rh/devtoolset-8/root/usr/bin/gcc
+        export CXX=/opt/rh/devtoolset-8/root/usr/bin/g++
         mkdir ITK-build
         cd ITK-build
         cmake \
@@ -43,6 +53,8 @@ jobs:
  
     - name: Build charm-gems
       run: |
+        export CC=/opt/rh/devtoolset-8/root/usr/bin/gcc
+        export CXX=/opt/rh/devtoolset-8/root/usr/bin/g++
         .github/workflows/linux_build.sh /opt/python/cp38-cp38/bin/python
         .github/workflows/linux_build.sh /opt/python/cp39-cp39/bin/python
         .github/workflows/linux_build.sh /opt/python/cp310-cp310/bin/python
