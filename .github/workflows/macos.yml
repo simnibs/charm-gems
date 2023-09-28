@@ -105,4 +105,4 @@ jobs:
         $PYTHON -m twine upload dist/*.whl -u __token__ -p "$PASSWORD"
       env:
         PASSWORD: ${{ secrets.PYPI_TOKEN }}
-        PYTHON: /Library/Frameworks/Python.framework/Versions/3.8/bin/python3
+        PYTHON: /usr/local/bin/python3.8
