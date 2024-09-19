@@ -9,8 +9,6 @@ on:
     branches: [ master ]
 
 jobs:
-  platform_matrix:
-    strategy:
       matrix:
         os: [macos-latest, macos-13]
 
