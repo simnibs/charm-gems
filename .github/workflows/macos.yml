@@ -9,11 +9,13 @@ on:
     branches: [ master ]
 
 jobs:
+  job_matrix:
+    strategy:
+      matrix:
+        os: [macos-latest, macos-13]
   build:
-    runs-on: macos-latest
+    runs-on: ${{ matrix.os }}
     if: ${{ startsWith(github.ref, 'refs/tags') || !contains(github.event.head_commit.message, '[skip ci]') }}
-    env:
-      MACOSX_DEPLOYMENT_TARGET: 11
 
     steps:
     - uses: actions/checkout@v2
