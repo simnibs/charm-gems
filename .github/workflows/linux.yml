@@ -24,7 +24,7 @@ jobs:
 
     - name: Download gcc 8 compilers
       run: |
-       yum install -y devtoolset-8
+        dnf-install -y gcc-toolset-X
 
     # - name: Install CMake and Zlib
     #   run: |
@@ -32,7 +32,7 @@ jobs:
     #     ln -s /usr/bin/cmake3 /usr/bin/cmake
     - name: Install Zlib
       run: |
-        yum install -y zlib-devel
+        dnf-install -y zlib-devel
 
     - name: Build ITK
       run: |
