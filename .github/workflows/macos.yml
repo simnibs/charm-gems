@@ -9,7 +9,6 @@ on:
     branches: [ master ]
 
 jobs:
-  if: ${{ startsWith(github.ref, 'refs/tags') || !contains(github.event.head_commit.message, '[skip ci]') }}
   build_matrix:
     strategy:
       matrix:
