@@ -9,10 +9,10 @@ on:
     branches: [ master ]
 
 jobs:
-  build_matrix:
+  example_matrix:
     strategy:
-    matrix:
-      os: [macos-latest, macos-13]
+      matrix:
+        os: [macos-latest, macos-13]
 
     runs-on: ${{ matrix.os }}
     steps:
