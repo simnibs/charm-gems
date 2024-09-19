@@ -100,7 +100,7 @@ jobs:
         ZLIB_LIBRARY: .\zlib-install\lib\zlibstatic.lib
 
     - name: Upload artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: windows-wheels
         path: .\dist\*.whl
