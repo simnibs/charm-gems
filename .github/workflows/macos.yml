@@ -18,8 +18,7 @@ jobs:
 
 
   steps:
-
-  - uses: actions/checkout@v4
+  uses: actions/checkout@v4
 
   # Download and install Python instead of using the setup_python
   # as the python interpreters in the Github machines

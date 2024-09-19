@@ -22,11 +22,11 @@ jobs:
         git submodule init
         git submodule update
 
-    - name: Download gcc 8 compilers
-      run: |
-       yum install -y centos-release-scl && \
-       yum-config-manager --enable rhel-server-rhscl-7-rpms && \
-       yum install -y devtoolset-8
+    # - name: Download gcc 8 compilers
+    #   run: |
+    #    yum install -y centos-release-scl && \
+    #    yum-config-manager --enable rhel-server-rhscl-7-rpms && \
+    #    yum install -y devtoolset-8
 
     - name: Install CMake and Zlib
       run: | 
